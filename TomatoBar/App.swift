@@ -21,9 +21,10 @@ struct TBApp: App {
     }
 
     var body: some Scene {
-        Settings {
+        WindowGroup {
             EmptyView()
         }
+        .windowStyle(.hiddenTitleBar)
     }
 }
 
@@ -49,6 +50,12 @@ class TBStatusItem: NSObject, NSApplicationDelegate {
         statusBarItem?.button?.imagePosition = .imageLeft
         setIcon(name: .idle)
         statusBarItem?.button?.action = #selector(TBStatusItem.togglePopover(_:))
+        
+        // Hide any visible windows for tray-only behavior
+        NSApp.setActivationPolicy(.accessory)
+        for window in NSApp.windows {
+            window.orderOut(nil)
+        }
     }
 
     func setTitle(title: String?) {
@@ -87,5 +94,13 @@ class TBStatusItem: NSObject, NSApplicationDelegate {
         } else {
             showPopover(sender)
         }
+    }
+    
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        return false
+    }
+    
+    @objc func showPreferences(_ sender: Any?) {
+        // Do nothing - prevents preferences window from opening
     }
 }
